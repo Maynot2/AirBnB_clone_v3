@@ -8,14 +8,14 @@ from models import storage
 from models.state import State
 
 
-@app_views.route('/states', methods = ['GET'])
+@app_views.route('/states', methods=['GET'])
 def show_states():
     """Returns json with all states"""
     states = storage.all(State).values()
     return jsonify([state.to_dict() for state in states])
 
 
-@app_views.route('/states/<state_id>', methods = ['GET'])
+@app_views.route('/states/<state_id>', methods=['GET'])
 def show_state(state_id):
     """Returns single state from given id"""
     state = storage.get(State, state_id)
@@ -24,7 +24,7 @@ def show_state(state_id):
     abort(404)
 
 
-@app_views.route('/states', methods = ['POST'])
+@app_views.route('/states', methods=['POST'])
 def create_state():
     """Creates new state"""
     state_dict = request.get_json()
@@ -37,7 +37,7 @@ def create_state():
     abort(400, 'Missing name')
 
 
-@app_views.route('/states/<state_id>', methods = ['PUT'])
+@app_views.route('/states/<state_id>', methods=['PUT'])
 def update_state(state_id):
     """Updates a state from given id"""
     state = storage.get(State, state_id)
@@ -53,7 +53,7 @@ def update_state(state_id):
     return jsonify(state.to_dict()), 200
 
 
-@app_views.route('/states/<state_id>', methods = ['DELETE'])
+@app_views.route('/states/<state_id>', methods=['DELETE'])
 def delete_state(state_id):
     """Deletes single state from given id"""
     state = storage.get(State, state_id)
