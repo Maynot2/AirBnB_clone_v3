@@ -22,7 +22,7 @@ def status():
 
 
 @app_views.route('/stats')
-def numberObj():
+def stats():
     """ Returns the number of each object by type """
     dict = {"amenities": storage.count(Amenity),
             "cities": storage.count(City),

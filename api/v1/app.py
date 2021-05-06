@@ -17,6 +17,7 @@ def teardown(self):
     """Closes storage after each url request"""
     storage.close()
 
+
 @app.errorhandler(404)
 def page_not_found(e):
     """ Returns a JSON-formatted 404 status code response"""
