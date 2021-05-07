@@ -108,13 +108,14 @@ def place_search():
             list1 = storage.all(Place).values()
 
     list2 = []
-    if "amenities" in filter.keys() and len(filters['amenities']) != 0:
+    if "amenities" in filters.keys() and len(filters['amenities']) != 0:
         filterAmenities = filters['amenities']
         setFilt = set(filterAmenities)
         for place in list1:
             placeAmenities = [amenity.id for amenity in place.amenities]
             setAmen = set(placeAmenities)
             if setFilt.issubset(setAmen):
+                delattr(place, "amenities")
                 list2.append(place)
     else:
         list2 = list1
