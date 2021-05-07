@@ -27,14 +27,12 @@ class User(BaseModel, Base):
 
     def __init__(self, *args, **kwargs):
         """initializes user"""
+        if kwargs:
+            passw = kwargs.pop('password', None)
+            if passw:
+                User.__encryptpassw(self, passw)
         super().__init__(*args, **kwargs)
 
-    @property
-    def password(self):
-        """Get password"""
-        return self._password
-
-    @password.setter
-    def password(self, pwd):
+    def __encryptpassw(self, pw):
         """Encoding password"""
-        self._password = hashlib.md5(pwd.encode('utf-8')).hexdigest()
+        setattr(self, "password", hashlib.md5(pw.encode('utf-8')).hexdigest())
