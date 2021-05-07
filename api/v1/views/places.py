@@ -86,7 +86,7 @@ def place_search():
         abort(400, 'Not a JSON')
     list1 = []
 
-    if "states" in filters.keys():
+    if "states" in filters.keys() and len(filters['states']) != 0:
         filterStates = filters["states"]
         allStates = storage.all(State).values()
         for state in allStates:
@@ -95,7 +95,7 @@ def place_search():
                     for place in city.places:
                         if place not in list1:
                             list1.append(place)
-    if "cities" in filters.keys():
+    if "cities" in filters.keys() and len(filters['cities']) != 0:
         filterCities = filters["cities"]
         allCities = storage.all(City).values()
         for city in allCities:
@@ -106,7 +106,7 @@ def place_search():
 
     if "states" not in filters.keys() or len(filters['states']) == 0:
         if "cities" not in filters.keys() or len(filters['cities']) == 0:
-            list1 = storage.all(Place).values()
+            list1 = [place for place in storage.all(Place).values()]
 
     list2 = []
     if "amenities" in filters.keys() and len(filters['amenities']) != 0:
