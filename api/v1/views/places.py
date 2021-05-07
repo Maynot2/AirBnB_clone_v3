@@ -75,3 +75,48 @@ def delete_place(place_id):
         storage.save()
         return jsonify({}), 200
     abort(404)
+
+
+@app_views.route('/places_search', methods=['POST'])
+def place_search():
+    """Search places with filters on states/cities and amenities"""
+    filters = request.get_json()
+    if type(filters) is not dict:
+        abort(400, 'Not a JSON')
+    list1 = []
+
+    if "states" in filters.keys():
+        filterStates = filters["states"]
+        allStates = storage.all(State).values()
+        for state in allStates:
+            if state.id in filterStates:
+                for city in state.cities:
+                    for place in city.places:
+                        if place not in list1:
+                            list1.append(place)
+    if "cities" in filters.keys():
+        filterCities = filters["cities"]
+        allCities = storage.all(City).values()
+        for city in allCities:
+            if city.id in filterCities:
+                for place in city.places:
+                    if place not in list1:
+                        list1.append(place)
+
+    if "states" not in filters.keys() or len(filters['states']) == 0:
+        if "cities" not in filters.keys() or len(filters['cities']) == 0:
+            list1 = storage.all(Place).values()
+
+    list2 = []
+    if "amenities" in filter.keys() and len(filters['amenities']) != 0:
+        filterAmenities = filters['amenities']
+        setFilt = set(filterAmenities)
+        for place in list1:
+            placeAmenities = [amenity.id for amenity in place.amenities]
+            setAmen = set(placeAmenities)
+            if setFilt.issubset(setAmen):
+                list2.append(place)
+    else:
+        list2 = list1
+
+    return jsonify([place.to_dict() for place in list2])
