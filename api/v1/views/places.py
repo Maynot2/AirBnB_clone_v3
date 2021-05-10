@@ -111,7 +111,7 @@ def place_search():
 
     list2 = []
 
-    """if "amenities" in filters.keys() and len(filters['amenities']) != 0:
+    if "amenities" in filters.keys() and len(filters['amenities']) != 0:
         filterAmenities = filters['amenities']
         setFilt = set(filterAmenities)
         for place in list1:
@@ -121,22 +121,8 @@ def place_search():
                 placeAmenities = [amen_id for amen_id in place.amenity_ids]
             setAmen = set(placeAmenities)
             if setFilt.issubset(setAmen):
-                delattr(place, "amenities")
                 list2.append(place)
     else:
-        list2 = list1 """
-    if 'amenities' in filters.keys():
-        list2 = list1.copy()
-        for place in list2:
-            for amenity_id in filters['amenities']:
-                amenity = storage.get(Amenity, amenity_id)
-                if getenv("HBNB_TYPE_STORAGE") == "db":
-                    if amenity not in place.amenities:
-                        list1.remove(place)
-                        break
-                else:
-                    if amenity.id not in place.amenity_ids:
-                        list1.remove(place)
-                        break
+        list2 = list1
 
-    return jsonify([place.to_dict() for place in list1])
+    return jsonify([place.to_dict() for place in list2])
