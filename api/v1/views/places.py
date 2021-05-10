@@ -87,7 +87,31 @@ def place_search():
         abort(400, 'Not a JSON')
     list1 = []
 
-    if "states" in filters.keys() and len(filters['states']) != 0:
+    data = request.get_json(silent=True)
+    places = storage.all(Place)
+    if data is None:
+        return make_response(jsonify({'error': 'Not a JSON'}), 400)
+    if data != {} and ('states' in data or 'cities' in data):
+        if 'state' in data and data['states'] == []:
+            if 'cities' in data and data['cities'] == []:
+                list1 = [place for place in places.values()]
+        if 'states' in data:
+            for state_id in data['states']:
+                state = storage.get(State, state_id)
+                for city in state.cities:
+                    if 'cities' in data and city.id in data['cities']:
+                        data['cities'].remove(city.id)
+                    for place in city.places:
+                        list1.append(place)
+        if 'cities' in data:
+            for city_id in data['cities']:
+                city = storage.get(City, city_id)
+                for place in city.places:
+                    list1.append(place)
+    else:
+        list1 = [place for place in places.values()]
+
+    """if "states" in filters.keys() and len(filters['states']) != 0:
         filterStates = filters["states"]
         allStates = storage.all(State).values()
         for state in allStates:
@@ -107,7 +131,7 @@ def place_search():
 
     if "states" not in filters.keys() or len(filters['states']) == 0:
         if "cities" not in filters.keys() or len(filters['cities']) == 0:
-            list1 = [place for place in storage.all(Place).values()]
+            list1 = [place for place in storage.all(Place).values()]"""
 
     list2 = []
 
