@@ -3,7 +3,7 @@
     API places view
 """
 from api.v1.views import app_views
-from flask import jsonify, request, abort, make_response
+from flask import jsonify, request, abort
 from models import storage
 from models.city import City
 from models.place import Place
@@ -83,10 +83,8 @@ def delete_place(place_id):
 def place_search():
     """Search places with filters on states/cities and amenities"""
     filters = request.get_json()
-    if filters is None:
-        return make_response(jsonify({'error': 'Not a JSON'}), 400)
     if type(filters) is not dict:
-        return make_response(jsonify({'error': 'Not a JSON'}), 400)
+        abort(400, 'Not a JSON')
     list1 = []
 
     if "states" in filters.keys() and len(filters['states']) != 0:
@@ -112,7 +110,8 @@ def place_search():
             list1 = [place for place in storage.all(Place).values()]
 
     list2 = []
-    if "amenities" in filters.keys() and len(filters['amenities']) != 0:
+
+    """if "amenities" in filters.keys() and len(filters['amenities']) != 0:
         filterAmenities = filters['amenities']
         setFilt = set(filterAmenities)
         for place in list1:
@@ -125,6 +124,19 @@ def place_search():
                 delattr(place, "amenities")
                 list2.append(place)
     else:
-        list2 = list1
+        list2 = list1 """
+    if 'amenities' in filters.keys():
+        list2 = list1.copy()
+        for place in list2:
+            for amenity_id in filters['amenities']:
+                amenity = storage.get(Amenity, amenity_id)
+                if getenv("HBNB_TYPE_STORAGE") == "db":
+                    if amenity not in place.amenities:
+                        list1.remove(place)
+                        break
+                else:
+                    if amenity.id not in place.amenity_ids:
+                        list1.remove(place)
+                        break
 
-    return jsonify([place.to_dict() for place in list2])
+    return jsonify([place.to_dict() for place in list1])
