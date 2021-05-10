@@ -1,6 +1,11 @@
+"""
+    Tests for State API
+"""
+
 import unittest
 import json
 from api.v1.app import app
+
 
 class StateTest(unittest.TestCase):
     def setUp(self):
@@ -12,8 +17,8 @@ class StateTest(unittest.TestCase):
         })
 
         response = self.app.post('/api/v1/state',
-                                  headers={"Content-Type": "application/json"},
-                                  data=json)
+                                 headers={"Content-Type": "application/json"},
+                                 data=json)
 
         self.assertEqual(str, type(response.json['state_id']))
         self.assertEqual(200, response.status_code)
