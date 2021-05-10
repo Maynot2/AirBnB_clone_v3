@@ -69,6 +69,7 @@ test_db_storage.py'])
 
 
 class TestFileStorage(unittest.TestCase):
+
     """Test the FileStorage class"""
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_all_returns_dict(self):
@@ -91,15 +92,16 @@ class TestFileStorage(unittest.TestCase):
     def test_count(self):
         """Test that count method counts objects properly"""
         sto = models.storage
-        self.assertTrue(sto.count(State) == 0)
-        self.assertTrue(sto.count() == 0)
+        c1 = sto.count(State)
+        c2 = sto.count(City)
+        c3 = sto.count()
         inst1 = State(name='State1')
         inst2 = City(name='City1', state_id=inst1.id)
         inst1.save()
         inst2.save()
-        self.assertTrue(sto.count(State) == 1)
-        self.assertTrue(sto.count(City) == 1)
-        self.assertTrue(sto.count() == 2)
+        self.assertTrue(sto.count(State) == c1 + 1)
+        self.assertTrue(sto.count(City) == c2 + 1)
+        self.assertTrue(sto.count() == c3 + 2)
 
     @unittest.skipIf(models.storage_t != 'db', 'not testing db storage')
     def test_get(self):

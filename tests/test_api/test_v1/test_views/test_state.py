@@ -20,9 +20,6 @@ class StateTest(unittest.TestCase):
                                  headers={"Content-Type": "application/json"},
                                  data=json_obj)
 
-        print(response.json)
-        print(response.status_code)
-
         self.assertEqual(str, type(response.json['id']))
         self.assertEqual(201, response.status_code)
         self.assertEqual('Alaska', response.json['name'])
