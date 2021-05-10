@@ -120,6 +120,7 @@ def place_search():
                 placeAmenities = [amen_id for amen_id in place.amenity_ids]
             setAmen = set(placeAmenities)
             if setFilt.issubset(setAmen):
+                delattr(place, 'amenities')
                 list2.append(place)
     else:
         list2 = list1
