@@ -8,6 +8,7 @@ from models import storage
 from models.city import City
 from models.place import Place
 from models.user import User
+from os import getenv
 
 
 @app_views.route('/cities/<city_id>/places', methods=['GET'])
@@ -113,10 +114,13 @@ def place_search():
         filterAmenities = filters['amenities']
         setFilt = set(filterAmenities)
         for place in list1:
-            placeAmenities = [amenity.id for amenity in place.amenities]
+            if getenv("HBNB_TYPE_STORAGE") == "db":
+                placeAmenities = [amenity.id for amenity in place.amenities]
+            else:
+                placeAmenities = [amen_id for amen_id in place.amenity_ids]
             setAmen = set(placeAmenities)
             if setFilt.issubset(setAmen):
-                delattr(place, "amenities")
+                """ delattr(place, "amenities") """
                 list2.append(place)
     else:
         list2 = list1
