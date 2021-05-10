@@ -78,93 +78,51 @@ def delete_place(place_id):
         return jsonify({}), 200
     abort(404)
 
-# @app_views.route('/places_search', methods=['POST'])
-# def place_search():
-#     """Search places with filters on states/cities and amenities"""
-#     filters = request.get_json()
-#     if type(filters) is not dict:
-#         abort(400, 'Not a JSON')
-#     list1 = []
-#     if "states" in filters.keys() and len(filters['states']) != 0:
-#         filterStates = filters["states"]
-#         allStates = storage.all(State).values()
-#         for state in allStates:
-#             if state.id in filterStates:
-#                 for city in state.cities:
-#                     for place in city.places:
-#                         if place not in list1:
-#                             list1.append(place)
-#     if "cities" in filters.keys() and len(filters['cities']) != 0:
-#         filterCities = filters["cities"]
-#         allCities = storage.all(City).values()
-#         for city in allCities:
-#             if city.id in filterCities:
-#                 for place in city.places:
-#                     if place not in list1:
-#                         list1.append(place)
 
-#     if "states" not in filters.keys() or len(filters['states']) == 0:
-#         if "cities" not in filters.keys() or len(filters['cities']) == 0:
-#             list1 = [place for place in storage.all(Place).values()]
-
-#     list2 = []
-
-#     if "amenities" in filters.keys() and len(filters['amenities']) != 0:
-#         filterAmenities = filters['amenities']
-#         setFilt = set(filterAmenities)
-#         for place in list1:
-#             if getenv("HBNB_TYPE_STORAGE") == "db":
-#                 placeAmenities = [amenity.id for amenity in place.amenities]
-#             else:
-#                 placeAmenities = [amen_id for amen_id in place.amenity_ids]
-#             setAmen = set(placeAmenities)
-#             if setFilt.issubset(setAmen):
-#                 delattr(place, 'amenities')
-#                 list2.append(place)
-#     else:
-#         list2 = list1
-
-#     return jsonify([place.to_dict() for place in list2])
-
-@app_views.route('places_search', methods=['POST'])
-def retrieve_place_json():
-    """Endpoint that retrieves all Place objects
-    depending of the JSON in the body of the reques"""
-    data = request.get_json(silent=True)
-    places = storage.all(Place)
-    response = []
-    if data is None:
-        return make_response(jsonify({'error': 'Not a JSON'}), 400)
-    if data != {} and ('states' in data or 'cities' in data):
-        if 'state' in data and data['states'] == []:
-            if 'cities' in data and data['cities'] == []:
-                response = [place for place in places.values()]
-        if 'states' in data:
-            for state_id in data['states']:
-                state = storage.get(State, state_id)
+@app_views.route('/places_search', methods=['POST'])
+def place_search():
+    """Search places with filters on states/cities and amenities"""
+    filters = request.get_json()
+    if type(filters) is not dict:
+        abort(400, 'Not a JSON')
+    list1 = []
+    if "states" in filters.keys() and len(filters['states']) != 0:
+        filterStates = filters["states"]
+        allStates = storage.all(State).values()
+        for state in allStates:
+            if state.id in filterStates:
                 for city in state.cities:
-                    if 'cities' in data and city.id in data['cities']:
-                        data['cities'].remove(city.id)
                     for place in city.places:
-                        response.append(place)
-        if 'cities' in data:
-            for city_id in data['cities']:
-                city = storage.get(City, city_id)
+                        if place not in list1:
+                            list1.append(place)
+    if "cities" in filters.keys() and len(filters['cities']) != 0:
+        filterCities = filters["cities"]
+        allCities = storage.all(City).values()
+        for city in allCities:
+            if city.id in filterCities:
                 for place in city.places:
-                    response.append(place)
+                    if place not in list1:
+                        list1.append(place)
+
+    if "states" not in filters.keys() or len(filters['states']) == 0:
+        if "cities" not in filters.keys() or len(filters['cities']) == 0:
+            list1 = [place for place in storage.all(Place).values()]
+
+    list2 = []
+
+    if "amenities" in filters.keys() and len(filters['amenities']) != 0:
+        filterAmenities = filters['amenities']
+        setFilt = set(filterAmenities)
+        for place in list1:
+            if getenv("HBNB_TYPE_STORAGE") == "db":
+                placeAmenities = [amenity.id for amenity in place.amenities]
+            else:
+                placeAmenities = [amen_id for amen_id in place.amenity_ids]
+            setAmen = set(placeAmenities)
+            if setFilt.issubset(setAmen):
+                delattr(place, 'amenities')
+                list2.append(place)
     else:
-        response = [place for place in places.values()]
-    if 'amenities' in data:
-        response_copy = response.copy()
-        for place in response_copy:
-            for amenity_id in data['amenities']:
-                amenity = storage.get(Amenity, amenity_id)
-                if getenv("HBNB_TYPE_STORAGE") == "db":
-                    if amenity not in place.amenities:
-                        response.remove(place)
-                        break
-                else:
-                    if amenity.id not in place.amenity_ids:
-                        response.remove(place)
-                        break
-    return jsonify([place.to_dict() for place in response])
+        list2 = list1
+
+    return jsonify([place.to_dict() for place in list2])

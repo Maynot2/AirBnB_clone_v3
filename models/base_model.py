@@ -68,8 +68,6 @@ class BaseModel:
         new_dict["__class__"] = self.__class__.__name__
         if "_sa_instance_state" in new_dict:
             del new_dict["_sa_instance_state"]
-        if "amenities" in new_dict:
-            new_dict.pop("amenities", None)
         classname = self.__class__.__name__
         if not save_file and classname == "User" and "password" in new_dict:
             del new_dict["password"]
